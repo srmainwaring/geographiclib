@@ -22,62 +22,12 @@
 cmake_minimum_required (VERSION 3.13.0)
 
 set (EXAMPLES0
-  example-Accumulator.cpp
-  example-AlbersEqualArea.cpp
-  example-AuxAngle.cpp
-  example-AuxLatitude.cpp
-  example-AzimuthalEquidistant.cpp
-  example-CassiniSoldner.cpp
-  example-CircularEngine.cpp
-  example-Constants.cpp
-  example-DMS.cpp
-  example-DST.cpp
-  example-Ellipsoid.cpp
-  example-EllipticFunction.cpp
-  example-GARS.cpp
-  example-GeoCoords.cpp
-  example-Geocentric.cpp
-  example-Geodesic.cpp
-  example-Geodesic-small.cpp
-  example-GeodesicExact.cpp
-  example-GeodesicLine.cpp
-  example-GeodesicLineExact.cpp
-  example-GeographicErr.cpp
-  example-Geohash.cpp
   example-Geoid.cpp
-  example-Georef.cpp
-  example-Gnomonic.cpp
-  example-GravityCircle.cpp
-  example-GravityModel.cpp
-  example-Intersect.cpp
-  example-LambertConformalConic.cpp
-  example-LocalCartesian.cpp
-  example-MGRS.cpp
-  example-MagneticCircle.cpp
-  example-MagneticModel.cpp
-  example-Math.cpp
-  example-NearestNeighbor.cpp
-  example-NormalGravity.cpp
-  example-OSGB.cpp
-  example-PolarStereographic.cpp
-  example-PolygonArea.cpp
-  example-Rhumb.cpp
-  example-RhumbLine.cpp
-  example-SphericalEngine.cpp
-  example-SphericalHarmonic.cpp
-  example-SphericalHarmonic1.cpp
-  example-SphericalHarmonic2.cpp
-  example-TransverseMercator.cpp
-  example-TransverseMercatorExact.cpp
-  example-UTMUPS.cpp
-  example-Utility.cpp
   )
-set (EXAMPLES1
-  GeoidToGTX.cpp make-egmcof.cpp)
 
 if (CALLED_FROM_TOPLEVEL)
   if (EXAMPLEDIR)
-    install (FILES CMakeLists.txt ${EXAMPLES0} ${EXAMPLES1} ${EXAMPLEHEADERS}
+    install (FILES CMakeLists.txt ${EXAMPLES0} ${EXAMPLEHEADERS}
       DESTINATION ${EXAMPLEDIR})
   endif ()
   # No more to do in add_subdirectory mode, so exit
@@ -147,23 +97,6 @@ foreach (EXAMPLE_SOURCE ${EXAMPLE_SOURCES})
     ${GeographicLib_LIBRARIES} ${GeographicLib_HIGHPREC_LIBRARIES})
 endforeach ()
 if (Boost_FOUND AND GEOGRAPHICLIB_PRECISION EQUAL 2)
-  target_link_libraries (example-NearestNeighbor ${Boost_LIBRARIES})
-endif ()
-
-find_package (OpenMP QUIET)
-
-if (OPENMP_FOUND OR OpenMP_FOUND)
-  set_target_properties (GeoidToGTX PROPERTIES
-    COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
-  if (OpenMP_CXX_INCLUDE_DIRS)
-    set_target_properties (GeoidToGTX PROPERTIES
-      INCLUDE_DIRECTORIES ${OpenMP_CXX_INCLUDE_DIRS})
-  endif ()
-  if (NOT WIN32)
-    set_target_properties (GeoidToGTX PROPERTIES
-      LINK_FLAGS ${OpenMP_CXX_FLAGS})
-  endif ()
-  target_link_libraries (GeoidToGTX ${OpenMP_CXX_LIBRARIES})
 endif ()
 
 if (MSVC OR CMAKE_CONFIGURATION_TYPES)
