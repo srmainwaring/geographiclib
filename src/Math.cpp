@@ -23,37 +23,6 @@ namespace GeographicLib {
                   "Bad value of precision");
   }
 
-  int Math::digits() {
-#if GEOGRAPHICLIB_PRECISION != 5
-    return numeric_limits<real>::digits;
-#else
-    return numeric_limits<real>::digits();
-#endif
-  }
-
-  int Math::set_digits(int ndigits) {
-#if GEOGRAPHICLIB_PRECISION != 5
-    (void)ndigits;
-#else
-    mpfr::mpreal::set_default_prec(ndigits >= 2 ? ndigits : 2);
-#endif
-    return digits();
-  }
-
-  int Math::digits10() {
-#if GEOGRAPHICLIB_PRECISION != 5
-    return numeric_limits<real>::digits10;
-#else
-    return numeric_limits<real>::digits10();
-#endif
-  }
-
-  int Math::extra_digits() {
-    return
-      digits10() > numeric_limits<double>::digits10 ?
-      digits10() - numeric_limits<double>::digits10 : 0;
-  }
-
   template<typename T> T Math::sum(T u, T v, T& t) {
     GEOGRAPHICLIB_VOLATILE T s = u + v;
     GEOGRAPHICLIB_VOLATILE T up = s - v;
@@ -77,30 +46,6 @@ namespace GeographicLib {
     if (y == 0) y = copysign(y, x);
 #endif
     return fabs(y) == T(hd) ? copysign(T(hd), x) : y;
-  }
-
-  template<typename T> T Math::AngDiff(T x, T y, T& e) {
-    // Use remainder instead of AngNormalize, since we treat boundary cases
-    // later taking account of the error
-    T d = sum(remainder(-x, T(td)), remainder( y, T(td)), e);
-    // This second sum can only change d if abs(d) < 128, so don't need to
-    // apply remainder yet again.
-    d = sum(remainder(d, T(td)), e, e);
-    // Fix the sign if d = -180, 0, 180.
-    if (d == 0 || fabs(d) == hd)
-      // If e == 0, take sign from y - x
-      // else (e != 0, implies d = +/-180), d and e must have opposite signs
-      d = copysign(d, e == 0 ? y - x : -e);
-    return d;
-  }
-
-  template<typename T> T Math::AngRound(T x) {
-    static const T z = T(1)/T(16);
-    GEOGRAPHICLIB_VOLATILE T y = fabs(x);
-    GEOGRAPHICLIB_VOLATILE T w = z - y;
-    // The compiler mustn't "simplify" z - (z - y) to y
-    y = w > 0 ? z - w : y;
-    return copysign(y, x);
   }
 
   template<typename T> T Math::NaN() {
@@ -132,8 +77,6 @@ namespace GeographicLib {
 #define GEOGRAPHICLIB_MATH_INSTANTIATE(T)                                  \
   template T    GEOGRAPHICLIB_EXPORT Math::sum          <T>(T, T, T&);     \
   template T    GEOGRAPHICLIB_EXPORT Math::AngNormalize <T>(T);            \
-  template T    GEOGRAPHICLIB_EXPORT Math::AngDiff      <T>(T, T, T&);     \
-  template T    GEOGRAPHICLIB_EXPORT Math::AngRound     <T>(T);            \
   template T    GEOGRAPHICLIB_EXPORT Math::NaN          <T>();             \
   template T    GEOGRAPHICLIB_EXPORT Math::infinity     <T>();
   // Instantiate with the standard floating type

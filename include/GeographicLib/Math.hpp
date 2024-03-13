@@ -144,34 +144,6 @@ namespace GeographicLib {
     };
 
     /**
-     * @return the number of bits of precision in a real number.
-     **********************************************************************/
-    static int digits();
-
-    /**
-     * Set the binary precision of a real number.
-     *
-     * @param[in] ndigits the number of bits of precision.
-     * @return the resulting number of bits of precision.
-     *
-     * This only has an effect when GEOGRAPHICLIB_PRECISION = 5.  See also
-     * Utility::set_digits for caveats about when this routine should be
-     * called.
-     **********************************************************************/
-    static int set_digits(int ndigits);
-
-    /**
-     * @return the number of decimal digits of precision in a real number.
-     **********************************************************************/
-    static int digits10();
-
-    /**
-     * Number of additional decimal digits of precision for real relative to
-     * double (0 for float).
-     **********************************************************************/
-    static int extra_digits();
-
-    /**
      * true if the machine is big-endian.
      **********************************************************************/
     static const bool bigendian = GEOGRAPHICLIB_WORDS_BIGENDIAN;
@@ -232,56 +204,6 @@ namespace GeographicLib {
      **********************************************************************/
     template<typename T> static T LatFix(T x)
     { using std::fabs; return fabs(x) > T(qd) ? NaN<T>() : x; }
-
-    /**
-     * The exact difference of two angles reduced to
-     * [&minus;180&deg;, 180&deg;].
-     *
-     * @tparam T the type of the arguments and returned value.
-     * @param[in] x the first angle in degrees.
-     * @param[in] y the second angle in degrees.
-     * @param[out] e the error term in degrees.
-     * @return \e d, the truncated value of \e y &minus; \e x.
-     *
-     * This computes \e z = \e y &minus; \e x exactly, reduced to
-     * [&minus;180&deg;, 180&deg;]; and then sets \e z = \e d + \e e where \e d
-     * is the nearest representable number to \e z and \e e is the truncation
-     * error.  If \e z = &plusmn;0&deg; or &plusmn;180&deg;, then the sign of
-     * \e d is given by the sign of \e y &minus; \e x.  The maximum absolute
-     * value of \e e is 2<sup>&minus;26</sup> (for doubles).
-     **********************************************************************/
-    template<typename T> static T AngDiff(T x, T y, T& e);
-
-    /**
-     * Difference of two angles reduced to [&minus;180&deg;, 180&deg;]
-     *
-     * @tparam T the type of the arguments and returned value.
-     * @param[in] x the first angle in degrees.
-     * @param[in] y the second angle in degrees.
-     * @return \e y &minus; \e x, reduced to the range [&minus;180&deg;,
-     *   180&deg;].
-     *
-     * The result is equivalent to computing the difference exactly, reducing
-     * it to [&minus;180&deg;, 180&deg;] and rounding the result.
-     **********************************************************************/
-    template<typename T> static T AngDiff(T x, T y)
-    { T e; return AngDiff(x, y, e); }
-
-    /**
-     * Coarsen a value close to zero.
-     *
-     * @tparam T the type of the argument and returned value.
-     * @param[in] x
-     * @return the coarsened value.
-     *
-     * The makes the smallest gap in \e x = 1/16 &minus; nextafter(1/16, 0) =
-     * 1/2<sup>57</sup> for doubles = 0.8 pm on the earth if \e x is an angle
-     * in degrees.  (This is about 2000 times more resolution than we get with
-     * angles around 90&deg;.)  We use this to avoid having to deal with near
-     * singular cases when \e x is non-zero but tiny (e.g.,
-     * 10<sup>&minus;200</sup>).  This sign of &plusmn;0 is preserved.
-     **********************************************************************/
-    template<typename T> static T AngRound(T x);
 
     /**
      * The NaN (not a number)

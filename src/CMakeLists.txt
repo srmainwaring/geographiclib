@@ -8,11 +8,10 @@ set (SOURCES
   )
 
 set (HEADERS
-  kissfft.hh
   ${PROJECT_BINARY_DIR}/include/GeographicLib/Config.h
   ../include/GeographicLib/Constants.hpp
   ../include/GeographicLib/Geoid.hpp
-  # ../include/GeographicLib/Math.hpp
+  ../include/GeographicLib/Math.hpp
   ../include/GeographicLib/Utility.hpp
   )
 
