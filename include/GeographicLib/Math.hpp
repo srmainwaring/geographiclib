@@ -36,7 +36,6 @@
 #endif
 
 #include <cmath>
-#include <algorithm>
 #include <limits>
 
 #if GEOGRAPHICLIB_PRECISION == 4

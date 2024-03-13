@@ -11,6 +11,7 @@
 #define GEOGRAPHICLIB_UTILITY_HPP 1
 
 #include <GeographicLib/Constants.hpp>
+#include <limits>
 #include <vector>
 #include <sstream>
 #include <cctype>
