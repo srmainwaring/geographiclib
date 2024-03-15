@@ -58,13 +58,9 @@ namespace GeographicLib {
    *
    * This class is typically \e not thread safe in that a single instantiation
    * cannot be safely used by multiple threads because of the way the object
-   * reads the data set and because it maintains a single-cell cache.  If
+   * reads the data set and because it maintains a single-cell cache. If
    * multiple threads need to calculate geoid heights they should all construct
-   * thread-local instantiations.  Alternatively, set the optional \e
-   * threadsafe parameter to true in the constructor.  This causes the
-   * constructor to read all the data into memory and to turn off the
-   * single-cell caching which results in a Geoid object which \e is thread
-   * safe.
+   * thread-local instantiations.
    *
    * Example of use:
    * \include example-Geoid.cpp
@@ -103,7 +99,6 @@ namespace GeographicLib {
     real _offset, _scale, _maxerror, _rmserror;
     int _width, _height;
     unsigned long long _datastart, _swidth;
-    bool _threadsafe;
 
     bool _has_file_load_error = false;
 
@@ -204,22 +199,17 @@ namespace GeographicLib {
      * @param[in] path (optional) directory for data file.
      * @param[in] cubic (optional) interpolation method; false means bilinear,
      *   true (the default) means cubic.
-     * @param[in] threadsafe (optional), if true, construct a thread safe
-     *   object.  The default is false
      * @note fail if the data file cannot be found, is
      *   unreadable, or is corrupt.
-     * @note fail if \e threadsafe is true but the memory
-     *   necessary for caching the data can't be allocated.
+     * @note fail if the memory necessary for caching the data
+     *   can't be allocated.
      *
      * The data file is formed by appending ".pgm" to the name.  If \e path is
      * specified (and is non-empty), then the file is loaded from directory, \e
-     * path.  Otherwise the path is given by DefaultGeoidPath().  If the \e
-     * threadsafe parameter is true, the data set is read into memory, the data
-     * file is closed, and single-cell caching is turned off; this results in a
-     * Geoid object which \e is thread safe.
+     * path.  Otherwise the path is given by DefaultGeoidPath().
      **********************************************************************/
     explicit Geoid(const std::string& name, const std::string& path = "",
-                   bool cubic = true, bool threadsafe = false);
+                   bool cubic = true);
 
     /**
      * Set up a cache.
@@ -234,7 +224,6 @@ namespace GeographicLib {
      *   can't be allocated (in this case, you will have no cache and can try
      *   again with a smaller area).
      * @note fail if there's a problem reading the data.
-     * @note fail if this is called on a threadsafe Geoid.
      *
      * Cache the data for the specified "rectangular" area bounded by the
      * parallels \e south and \e north and the meridians \e west and \e east.
@@ -251,7 +240,6 @@ namespace GeographicLib {
      *   can't be allocated (in this case, you will have no cache and can try
      *   again with a smaller area).
      * @note fail if there's a problem reading the data.
-     * @note fail if this is called on a threadsafe Geoid.
      *
      * On most computers, this is fast for data sets with grid resolution of 5'
      * or coarser.  For a 1' grid, the required RAM is 450MB; a 2.5' grid needs
@@ -387,11 +375,6 @@ namespace GeographicLib {
      * geoid heights.
      **********************************************************************/
     Math::real Scale() const { return _scale; }
-
-    /**
-     * @return true if the object is constructed to be thread safe.
-     **********************************************************************/
-    bool ThreadSafe() const { return _threadsafe; }
 
     /**
      * @return true if a data cache is active.

@@ -193,8 +193,7 @@ namespace GeographicLib {
      18,  -36,    2,   0,  -66,  -51, 0,   0,  102,  31,
   };
 
-  Geoid::Geoid(const std::string& name, const std::string& path, bool cubic,
-               bool threadsafe)
+  Geoid::Geoid(const std::string& name, const std::string& path, bool cubic)
     : _name(name)
     , _dir(path)
     , _cubic(cubic)
@@ -202,7 +201,6 @@ namespace GeographicLib {
     , _e2( (2 - Constants::WGS84_f()) * Constants::WGS84_f() )
     , _degree( Math::degree() )
     , _eps( sqrt(numeric_limits<real>::epsilon()) )
-    , _threadsafe(false)        // Set after cache is read
   {
     static_assert(sizeof(pixel_t) == pixel_size_, "pixel_t has the wrong size");
     if (_dir.empty())
@@ -333,11 +331,6 @@ namespace GeographicLib {
     _iy = _height;
     // Ensure that file errors throw exceptions
     _file.exceptions(ifstream::eofbit | ifstream::failbit | ifstream::badbit);
-    if (threadsafe) {
-      CacheAll();
-      _file.close();
-      _threadsafe = true;
-    }
   }
 
   bool Geoid::height(real lat, real lon, real& h_out) const {
@@ -361,7 +354,7 @@ namespace GeographicLib {
     real v00 = 0, v01 = 0, v10 = 0, v11 = 0;
     real t[nterms_];
 
-    if (_threadsafe || !(ix == _ix && iy == _iy)) {
+    if (!(ix == _ix && iy == _iy)) {
       if (!_cubic) {
         bool read_ok = true;
         read_ok &= rawval(ix    , iy    , v00);
@@ -417,7 +410,7 @@ namespace GeographicLib {
         b = (1 - fx) * v10 + fx * v11,
         c = (1 - fy) * a + fy * b,
         h = _offset + _scale * c;
-      if (!_threadsafe) {
+      {
         _ix = ix;
         _iy = iy;
         _v00 = v00;
@@ -432,7 +425,7 @@ namespace GeographicLib {
         fy * (t[2] + fx * (t[4] + fx * t[7]) +
              fy * (t[5] + fx * t[8] + fy * t[9]));
       h = _offset + _scale * h;
-      if (!_threadsafe) {
+      {
         _ix = ix;
         _iy = iy;
         copy(t, t + nterms_, _t);
@@ -443,7 +436,7 @@ namespace GeographicLib {
   }
 
   void Geoid::CacheClear() const {
-    if (!_threadsafe) {
+    {
       _cache = false;
       try {
         _data.clear();
@@ -456,10 +449,6 @@ namespace GeographicLib {
   }
 
   bool Geoid::CacheArea(real south, real west, real north, real east) const {
-    if (_threadsafe) {
-      printf("Attempt to change cache of threadsafe Geoid\n");
-      return false;
-    }
     if (south > north) {
       CacheClear();
       return true;
