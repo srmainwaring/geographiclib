@@ -87,8 +87,3 @@ set (bindir "\${exec_prefix}/${BINDIR}")
 set (PACKAGE_NAME "${PROJECT_NAME}")
 set (PACKAGE_VERSION "${PROJECT_VERSION}")
 
-configure_file (project.pc.in geographiclib.pc @ONLY)
-if (PKGDIR)
-  install (FILES "${CMAKE_CURRENT_BINARY_DIR}/geographiclib.pc"
-    DESTINATION "${PKGDIR}")
-endif ()
