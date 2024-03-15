@@ -24,7 +24,7 @@ namespace GeographicLib {
    * Example of use:
    * \include example-Utility.cpp
    **********************************************************************/
-  class GEOGRAPHICLIB_EXPORT Utility {
+  class Utility {
   public:
 
     /**

@@ -46,9 +46,9 @@ namespace GeographicLib {
   /// \cond SKIP
   // Instantiate
 #define GEOGRAPHICLIB_MATH_INSTANTIATE(T)                                  \
-  template T    GEOGRAPHICLIB_EXPORT Math::sum          <T>(T, T, T&);     \
-  template T    GEOGRAPHICLIB_EXPORT Math::AngNormalize <T>(T);            \
-  template T    GEOGRAPHICLIB_EXPORT Math::NaN          <T>();
+  template T    Math::sum          <T>(T, T, T&);     \
+  template T    Math::AngNormalize <T>(T);            \
+  template T    Math::NaN          <T>();
   // Instantiate with the standard floating type
   GEOGRAPHICLIB_MATH_INSTANTIATE(float)
   GEOGRAPHICLIB_MATH_INSTANTIATE(double)
@@ -56,7 +56,7 @@ namespace GeographicLib {
 #undef GEOGRAPHICLIB_MATH_INSTANTIATE
 
   // Also we need int versions for Utility::nummatch
-  template int GEOGRAPHICLIB_EXPORT Math::NaN     <int>();
+  template int Math::NaN     <int>();
   /// \endcond
 
 } // namespace GeographicLib

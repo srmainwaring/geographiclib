@@ -36,8 +36,6 @@
                            GEOGRAPHICLIB_VERSION_MINOR, \
                            GEOGRAPHICLIB_VERSION_PATCH)
 
-#define GEOGRAPHICLIB_EXPORT
-
 // Use GEOGRAPHICLIB_DEPRECATED to mark functions, types or variables as
 // deprecated.  Code inspired by Apache Subversion's svn_types.h file (via
 // MPFR).
@@ -73,7 +71,7 @@ namespace GeographicLib {
    * Example of use:
    * \include example-Constants.cpp
    **********************************************************************/
-  class GEOGRAPHICLIB_EXPORT Constants {
+  class Constants {
   private:
     typedef Math::real real;
     Constants() = delete;       // Disable constructor

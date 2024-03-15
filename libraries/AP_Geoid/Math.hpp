@@ -48,7 +48,7 @@ namespace GeographicLib {
    * Example of use:
    * \include example-Math.cpp
    **********************************************************************/
-  class GEOGRAPHICLIB_EXPORT Math {
+  class Math {
   private:
     void dummy();               // Static check for GEOGRAPHICLIB_PRECISION
     Math() = delete;            // Disable constructor
