@@ -45,13 +45,7 @@ set (PROJECT_ALL_LIBRARIES
 set (LIBNAME "GeographicLib")
 
 include (CheckTypeSize)
-check_type_size ("long double" LONG_DOUBLE BUILTIN_TYPES_ONLY)
 check_type_size ("double" DOUBLE BUILTIN_TYPES_ONLY)
-if (HAVE_LONG_DOUBLE AND (LONG_DOUBLE GREATER DOUBLE))
-  set (GEOGRAPHICLIB_HAVE_LONG_DOUBLE TRUE)
-else ()
-  set (GEOGRAPHICLIB_HAVE_LONG_DOUBLE FALSE)
-endif ()
 include (TestBigEndian)
 test_big_endian (GEOGRAPHICLIB_WORDS_BIGENDIAN)
 
@@ -68,9 +62,6 @@ if (NOT FLOAT_CONVERSION)
 endif ()
 set (CMAKE_CXX_FLAGS
   "${CMAKE_CXX_FLAGS} -Wall -Wextra ${FLOAT_CONVERSION_FLAG}")
-if (CONVERT_WARNINGS_TO_ERRORS)
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
-endif ()
 
 # Tell Intel compiler to do arithmetic accurately.  This is needed to
 # stop the compiler from ignoring parentheses in expressions like
@@ -81,7 +72,6 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
     "${CMAKE_CXX_FLAGS} -fp-model precise -diag-disable=11074,11076")
 endif ()
 
-set (HIGHPREC_LIBRARIES)
 if (GEOGRAPHICLIB_PRECISION EQUAL 1)
   message (WARNING "Compiling with floats which results in poor accuracy")
 elseif (GEOGRAPHICLIB_PRECISION EQUAL 2)

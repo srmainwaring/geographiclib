@@ -18,19 +18,12 @@
 #  define GEOGRAPHICLIB_WORDS_BIGENDIAN 0
 #endif
 
-#if !defined(GEOGRAPHICLIB_HAVE_LONG_DOUBLE)
-#  define GEOGRAPHICLIB_HAVE_LONG_DOUBLE 0
-#endif
-
 #if !defined(GEOGRAPHICLIB_PRECISION)
 /**
  * The precision of floating point numbers used in %GeographicLib.  1 means
- * float (single precision); 2 (the default) means double; 3 means long double;
- * 4 is reserved for quadruple precision.  Nearly all the testing has been
- * carried out with doubles and that's the recommended configuration.  In order
- * for long double to be used, GEOGRAPHICLIB_HAVE_LONG_DOUBLE needs to be
- * defined.  Note that with Microsoft Visual Studio, long double is the same as
- * double.
+ * float (single precision); 2 (the default) means double;
+ * Nearly all the testing has been carried out with doubles and that's the
+ * recommended configuration.
  **********************************************************************/
 #  define GEOGRAPHICLIB_PRECISION 2
 #endif
@@ -38,28 +31,10 @@
 #include <cmath>
 #include <limits>
 
-#if GEOGRAPHICLIB_PRECISION == 4
-#include <memory>
-#include <boost/version.hpp>
-#include <boost/multiprecision/float128.hpp>
-#include <boost/math/special_functions.hpp>
-#elif GEOGRAPHICLIB_PRECISION == 5
-#include <mpreal.h>
-#endif
-
-#if GEOGRAPHICLIB_PRECISION > 3
-// volatile keyword makes no sense for multiprec types
-#define GEOGRAPHICLIB_VOLATILE
-// Signal a convergence failure with multiprec types by throwing an exception
-// at loop exit.
-#define GEOGRAPHICLIB_PANIC \
-  (throw GeographicLib::GeographicErr("Convergence failure"), false)
-#else
 #define GEOGRAPHICLIB_VOLATILE volatile
 // Ignore convergence failures with standard floating points types by allowing
 // loop to exit cleanly.
 #define GEOGRAPHICLIB_PANIC false
-#endif
 
 namespace GeographicLib {
 
@@ -79,16 +54,6 @@ namespace GeographicLib {
     Math() = delete;            // Disable constructor
   public:
 
-#if GEOGRAPHICLIB_HAVE_LONG_DOUBLE
-    /**
-     * The extended precision type for real numbers, used for some testing.
-     * This is long double on computers with this type; otherwise it is double.
-     **********************************************************************/
-    typedef long double extended;
-#else
-    typedef double extended;
-#endif
-
 #if GEOGRAPHICLIB_PRECISION == 2
     /**
      * The real type for %GeographicLib. Nearly all the testing has been done
@@ -99,12 +64,6 @@ namespace GeographicLib {
     typedef double real;
 #elif GEOGRAPHICLIB_PRECISION == 1
     typedef float real;
-#elif GEOGRAPHICLIB_PRECISION == 3
-    typedef extended real;
-#elif GEOGRAPHICLIB_PRECISION == 4
-    typedef boost::multiprecision::float128 real;
-#elif GEOGRAPHICLIB_PRECISION == 5
-    typedef mpfr::mpreal real;
 #else
     typedef double real;
 #endif

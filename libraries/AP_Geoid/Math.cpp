@@ -19,7 +19,7 @@ namespace GeographicLib {
   using namespace std;
 
   void Math::dummy() {
-    static_assert(GEOGRAPHICLIB_PRECISION >= 1 && GEOGRAPHICLIB_PRECISION <= 5,
+    static_assert(GEOGRAPHICLIB_PRECISION >= 1 && GEOGRAPHICLIB_PRECISION <= 2,
                   "Bad value of precision");
   }
 
@@ -39,12 +39,6 @@ namespace GeographicLib {
 
   template<typename T> T Math::AngNormalize(T x) {
     T y = remainder(x, T(td));
-#if GEOGRAPHICLIB_PRECISION == 4
-    // boost-quadmath doesn't set the sign of 0 correctly, see
-    // https://github.com/boostorg/multiprecision/issues/426
-    // Fixed by https://github.com/boostorg/multiprecision/pull/428
-    if (y == 0) y = copysign(y, x);
-#endif
     return fabs(y) == T(hd) ? copysign(T(hd), x) : y;
   }
 
@@ -82,15 +76,6 @@ namespace GeographicLib {
   // Instantiate with the standard floating type
   GEOGRAPHICLIB_MATH_INSTANTIATE(float)
   GEOGRAPHICLIB_MATH_INSTANTIATE(double)
-
-#if GEOGRAPHICLIB_HAVE_LONG_DOUBLE
-  // Instantiate if long double is distinct from double
-  GEOGRAPHICLIB_MATH_INSTANTIATE(long double)
-#endif
-#if GEOGRAPHICLIB_PRECISION > 3
-  // Instantiate with the high precision type
-  GEOGRAPHICLIB_MATH_INSTANTIATE(Math::real)
-#endif
 
 #undef GEOGRAPHICLIB_MATH_INSTANTIATE
 
