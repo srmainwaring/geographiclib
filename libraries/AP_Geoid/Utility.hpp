@@ -10,11 +10,12 @@
 #if !defined(GEOGRAPHICLIB_UTILITY_HPP)
 #define GEOGRAPHICLIB_UTILITY_HPP 1
 
-#include <AP_Geoid/Constants.hpp>
 #include <limits>
 #include <vector>
 #include <sstream>
 #include <cctype>
+
+#include <AP_Geoid/Math.hpp>
 
 namespace GeographicLib {
 
@@ -38,21 +39,22 @@ namespace GeographicLib {
      *   (external).
      * @param[out] array the output array of type IntT (internal).
      * @param[in] num the size of the array.
-     * @exception GeographicErr if the data cannot be read.
      **********************************************************************/
     template<typename ExtT, typename IntT, bool bigendp>
-      static void readarray(std::istream& str, IntT array[], size_t num) {
+      static bool readarray(std::istream& str, IntT array[], size_t num) {
       if (sizeof(IntT) == sizeof(ExtT) &&
           std::numeric_limits<IntT>::is_integer ==
           std::numeric_limits<ExtT>::is_integer)
         {
           // Data is compatible (aside from the issue of endian-ness).
           str.read(reinterpret_cast<char*>(array), num * sizeof(ExtT));
-          if (!str.good())
-            throw GeographicErr("Failure reading data");
+          if (!str.good()) {
+            return false;
+          }
           if (bigendp != Math::bigendian) { // endian mismatch -> swap bytes
-            for (size_t i = num; i--;)
+            for (size_t i = num; i--;) {
               array[i] = Math::swab<IntT>(array[i]);
+            }
           }
         }
       else
@@ -64,16 +66,18 @@ namespace GeographicLib {
           while (k) {
             int n = (std::min)(k, bufsize);
             str.read(reinterpret_cast<char*>(buffer), n * sizeof(ExtT));
-            if (!str.good())
-              throw GeographicErr("Failure reading data");
-            for (int j = 0; j < n; ++j)
+            if (!str.good()) {
+              return false;
+            }
+            for (int j = 0; j < n; ++j) {
               // fix endian-ness and cast to IntT
               array[i++] = IntT(bigendp == Math::bigendian ? buffer[j] :
                                 Math::swab<ExtT>(buffer[j]));
+            }
             k -= n;
           }
         }
-      return;
+      return true;
     }
 
     /**
@@ -87,12 +91,13 @@ namespace GeographicLib {
      * @param[in] str the input stream containing the data of type ExtT
      *   (external).
      * @param[out] array the output vector of type IntT (internal).
-     * @exception GeographicErr if the data cannot be read.
      **********************************************************************/
     template<typename ExtT, typename IntT, bool bigendp>
-      static void readarray(std::istream& str, std::vector<IntT>& array) {
-      if (array.size() > 0)
-        readarray<ExtT, IntT, bigendp>(str, &array[0], array.size());
+      static bool readarray(std::istream& str, std::vector<IntT>& array) {
+      if (array.size() > 0) {
+        return readarray<ExtT, IntT, bigendp>(str, &array[0], array.size());
+      }
+      return false;
     }
 
   };

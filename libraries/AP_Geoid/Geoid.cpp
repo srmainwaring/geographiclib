@@ -8,6 +8,7 @@
  **********************************************************************/
 
 #include <AP_Geoid/Geoid.hpp>
+#include <iostream>
 // For getenv
 #include <cstdlib>
 #include <AP_Geoid/Utility.hpp>
@@ -209,11 +210,17 @@ namespace GeographicLib {
       _dir = DefaultGeoidPath();
     _filename = _dir + "/" + _name + (pixel_size_ != 4 ? ".pgm" : ".pgm4");
     _file.open(_filename.c_str(), ios::binary);
-    if (!(_file.good()))
-      throw GeographicErr("File not readable " + _filename);
+    if (!(_file.good())) {
+      std::cout << "File not readable " <<  _filename << "\n";
+      _has_file_load_error = true;
+      return;
+    }
     string s;
-    if (!(getline(_file, s) && s == "P5"))
-      throw GeographicErr("File not in PGM format " + _filename);
+    if (!(getline(_file, s) && s == "P5")) {
+      std::cout << "File not in PGM format " << _filename << "\n";
+      _has_file_load_error = true;
+      return;
+    }
     _offset = numeric_limits<real>::max();
     _scale = 0;
     _maxerror = _rmserror = -1;
@@ -233,11 +240,17 @@ namespace GeographicLib {
           if (p != string::npos)
             (key == "Description" ? _description : _datetime) = s.substr(p);
         } else if (key == "Offset") {
-          if (!(is >> _offset))
-            throw GeographicErr("Error reading offset " + _filename);
+          if (!(is >> _offset)) {
+            std::cout << "Error reading offset " << _filename << "\n";
+            _has_file_load_error = true;
+            return;
+          }
         } else if (key == "Scale") {
-          if (!(is >> _scale))
-            throw GeographicErr("Error reading scale " + _filename);
+          if (!(is >> _scale)) {
+            std::cout << "Error reading scale " << _filename << "\n";
+            _has_file_load_error = true;
+            return;
+          }
         } else if (key == (_cubic ? "MaxCubicError" : "MaxBilinearError")) {
           // It's not an error if the error can't be read
           is >> _maxerror;
@@ -247,43 +260,73 @@ namespace GeographicLib {
         }
       } else {
         istringstream is(s);
-        if (!(is >> _width >> _height))
-          throw GeographicErr("Error reading raster size " + _filename);
+        if (!(is >> _width >> _height)) {
+          std::cout << "Error reading raster size " << _filename << "\n";
+          _has_file_load_error = true;
+          return;
+        }
         break;
       }
     }
     {
       unsigned maxval;
-      if (!(_file >> maxval))
-        throw GeographicErr("Error reading maxval " + _filename);
-      if (maxval != pixel_max_)
-        throw GeographicErr("Incorrect value of maxval " + _filename);
+      if (!(_file >> maxval)) {
+        std::cout << "Error reading maxval " << _filename << "\n";
+        _has_file_load_error = true;
+        return;
+      }
+      if (maxval != pixel_max_) {
+        std::cout << "Incorrect value of maxval " << _filename << "\n";
+        _has_file_load_error = true;
+        return;
+      }
       // Add 1 for whitespace after maxval
       _datastart = (unsigned long long)(_file.tellg()) + 1ULL;
       _swidth = (unsigned long long)(_width);
     }
-    if (_offset == numeric_limits<real>::max())
-      throw GeographicErr("Offset not set " + _filename);
-    if (_scale == 0)
-      throw GeographicErr("Scale not set " + _filename);
-    if (_scale < 0)
-      throw GeographicErr("Scale must be positive " + _filename);
-    if (_height < 2 || _width < 2)
+    if (_offset == numeric_limits<real>::max()) {
+      std::cout << "Offset not set " << _filename << "\n";
+      _has_file_load_error = true;
+      return;
+    }
+    if (_scale == 0) {
+      std::cout << "Scale not set " << _filename << "\n";
+      _has_file_load_error = true;
+      return;
+    }
+    if (_scale < 0) {
+      std::cout << "Scale must be positive " << _filename << "\n";
+      _has_file_load_error = true;
+      return;
+    }
+    if (_height < 2 || _width < 2) {
       // Coarsest grid spacing is 180deg.
-      throw GeographicErr("Raster size too small " + _filename);
-    if (_width & 1)
+      std::cout << "Raster size too small " << _filename << "\n";
+      _has_file_load_error = true;
+      return;
+    }
+    if (_width & 1) {
       // This is so that longitude grids can be extended thru the poles.
-      throw GeographicErr("Raster width is odd " + _filename);
-    if (!(_height & 1))
+      std::cout << "Raster width is odd " << _filename << "\n";
+      _has_file_load_error = true;
+      return;
+    }
+    if (!(_height & 1)) {
       // This is so that latitude grid includes the equator.
-      throw GeographicErr("Raster height is even " + _filename);
+      std::cout << "Raster height is even " << _filename << "\n";
+      _has_file_load_error = true;
+      return;
+    }
     _file.seekg(0, ios::end);
     if (!_file.good() ||
         _datastart + pixel_size_ * _swidth * (unsigned long long)(_height) !=
-        (unsigned long long)(_file.tellg()))
+        (unsigned long long)(_file.tellg())) {
       // Possibly this test should be "<" because the file contains, e.g., a
       // second image.  However, for now we are more strict.
-      throw GeographicErr("File has the wrong length " + _filename);
+      std::cout << "File has the wrong length " << _filename << "\n";
+      _has_file_load_error = true;
+      return;
+    }
     _rlonres = _width / real(Math::td);
     _rlatres = (_height - 1) / real(Math::hd);
     _cache = false;
@@ -298,11 +341,12 @@ namespace GeographicLib {
     }
   }
 
-  Math::real Geoid::height(real lat, real lon) const {
+  bool Geoid::height(real lat, real lon, real& h_out) const {
     using std::isnan;           // Needed for Centos 7, ubuntu 14
     lat = Math::LatFix(lat);
     if (isnan(lat) || isnan(lon)) {
-      return Math::NaN();
+      h_out = Math::NaN();
+      return true;
     }
     lon = Math::AngNormalize(lon);
     real
@@ -320,25 +364,35 @@ namespace GeographicLib {
 
     if (_threadsafe || !(ix == _ix && iy == _iy)) {
       if (!_cubic) {
-        v00 = rawval(ix    , iy    );
-        v01 = rawval(ix + 1, iy    );
-        v10 = rawval(ix    , iy + 1);
-        v11 = rawval(ix + 1, iy + 1);
+        bool read_ok = true;
+        read_ok &= rawval(ix    , iy    , v00);
+        read_ok &= rawval(ix + 1, iy    , v01);
+        read_ok &= rawval(ix    , iy + 1, v10);
+        read_ok &= rawval(ix + 1, iy + 1, v11);
+        if (!read_ok) {
+          h_out = Math::NaN();
+          return false;
+        }
       } else {
         real v[stencilsize_];
         int k = 0;
-        v[k++] = rawval(ix    , iy - 1);
-        v[k++] = rawval(ix + 1, iy - 1);
-        v[k++] = rawval(ix - 1, iy    );
-        v[k++] = rawval(ix    , iy    );
-        v[k++] = rawval(ix + 1, iy    );
-        v[k++] = rawval(ix + 2, iy    );
-        v[k++] = rawval(ix - 1, iy + 1);
-        v[k++] = rawval(ix    , iy + 1);
-        v[k++] = rawval(ix + 1, iy + 1);
-        v[k++] = rawval(ix + 2, iy + 1);
-        v[k++] = rawval(ix    , iy + 2);
-        v[k++] = rawval(ix + 1, iy + 2);
+        bool read_ok = true;
+        read_ok &= rawval(ix    , iy - 1, v[k++]);
+        read_ok &= rawval(ix + 1, iy - 1, v[k++]);
+        read_ok &= rawval(ix - 1, iy    , v[k++]);
+        read_ok &= rawval(ix    , iy    , v[k++]);
+        read_ok &= rawval(ix + 1, iy    , v[k++]);
+        read_ok &= rawval(ix + 2, iy    , v[k++]);
+        read_ok &= rawval(ix - 1, iy + 1, v[k++]);
+        read_ok &= rawval(ix    , iy + 1, v[k++]);
+        read_ok &= rawval(ix + 1, iy + 1, v[k++]);
+        read_ok &= rawval(ix + 2, iy + 1, v[k++]);
+        read_ok &= rawval(ix    , iy + 2, v[k++]);
+        read_ok &= rawval(ix + 1, iy + 2, v[k++]);
+        if (!read_ok) {
+          h_out = Math::NaN();
+          return false;
+        }
 
         const int* c3x = iy == 0 ? c3n_ : (iy == _height - 2 ? c3s_ : c3_);
         int c0x = iy == 0 ? c0n_ : (iy == _height - 2 ? c0s_ : c0_);
@@ -372,7 +426,8 @@ namespace GeographicLib {
         _v10 = v10;
         _v11 = v11;
       }
-      return h;
+      h_out = h;
+      return true;
     } else {
       real h = t[0] + fx * (t[1] + fx * (t[3] + fx * t[6])) +
         fy * (t[2] + fx * (t[4] + fx * t[7]) +
@@ -383,7 +438,8 @@ namespace GeographicLib {
         _iy = iy;
         copy(t, t + nterms_, _t);
       }
-      return h;
+      h_out = h;
+      return true;
     }
   }
 
@@ -400,12 +456,14 @@ namespace GeographicLib {
     }
   }
 
-  void Geoid::CacheArea(real south, real west, real north, real east) const {
-    if (_threadsafe)
-      throw GeographicErr("Attempt to change cache of threadsafe Geoid");
+  bool Geoid::CacheArea(real south, real west, real north, real east) const {
+    if (_threadsafe) {
+      std::cout << "Attempt to change cache of threadsafe Geoid\n";
+      return false;
+    }
     if (south > north) {
       CacheClear();
-      return;
+      return true;
     }
     south = Math::LatFix(south);
     north = Math::LatFix(north);
@@ -449,7 +507,8 @@ namespace GeographicLib {
     }
     catch (const bad_alloc&) {
       CacheClear();
-      throw GeographicErr("Insufficient memory for caching " + _filename);
+      std::cout << "Insufficient memory for caching " <<  _filename << "\n";
+      return false;
     }
 
     try {
@@ -477,8 +536,10 @@ namespace GeographicLib {
     }
     catch (const exception& e) {
       CacheClear();
-      throw GeographicErr(string("Error filling cache ") + e.what());
+      std::cout << "Error filling cache " << e.what() << "\n";
+      return false;
     }
+    return true;
   }
 
   string Geoid::DefaultGeoidPath() {

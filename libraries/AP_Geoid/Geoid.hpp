@@ -12,6 +12,7 @@
 
 #include <vector>
 #include <fstream>
+#include <iostream>
 #include <AP_Geoid/Constants.hpp>
 
 #if !defined(GEOGRAPHICLIB_GEOID_PGM_PIXEL_WIDTH)
@@ -104,6 +105,9 @@ namespace GeographicLib {
     int _width, _height;
     unsigned long long _datastart, _swidth;
     bool _threadsafe;
+
+    bool _has_file_load_error = false;
+
     // Area cache
     mutable std::vector< std::vector<pixel_t> > _data;
     mutable bool _cache;
@@ -113,21 +117,27 @@ namespace GeographicLib {
     mutable int _ix, _iy;
     mutable real _v00, _v01, _v10, _v11;
     mutable real _t[nterms_];
+
     void filepos(int ix, int iy) const {
       _file.seekg(std::streamoff
                   (_datastart +
                    pixel_size_ * (unsigned(iy)*_swidth + unsigned(ix))));
     }
-    real rawval(int ix, int iy) const {
-      if (ix < 0)
+
+    // return true if ok, false otherwise.
+    bool rawval(int ix, int iy, real& val) const {
+      if (ix < 0) {
         ix += _width;
-      else if (ix >= _width)
+      }
+      else if (ix >= _width) {
         ix -= _width;
+      }
       if (_cache && iy >= _yoffset && iy < _yoffset + _ysize &&
           ((ix >= _xoffset && ix < _xoffset + _xsize) ||
            (ix + _width >= _xoffset && ix + _width < _xoffset + _xsize))) {
-        return real(_data[iy - _yoffset]
+        val = real(_data[iy - _yoffset]
                     [ix >= _xoffset ? ix - _xoffset : ix + _width - _xoffset]);
+        return true;
       } else {
         if (iy < 0 || iy >= _height) {
           iy = iy < 0 ? -iy : 2 * (_height - 1) - iy;
@@ -145,22 +155,21 @@ namespace GeographicLib {
             _file.get(b);
             r = (r << 16) | ((unsigned char)(a) << 8) | (unsigned char)(b);
           }
-          return real(r);
+          // return real(r);
+          val = real(r);
+          return true;
         }
         catch (const std::exception& e) {
-          // throw GeographicErr("Error reading " + _filename + ": "
-          //                      + e.what());
-          // triggers complaints about the "binary '+'" under Visual Studio.
-          // So use '+=' instead.
           std::string err("Error reading ");
           err += _filename;
           err += ": ";
           err += e.what();
-          throw GeographicErr(err);
+          std::cout << err << "\n";
+          return false;
         }
       }
     }
-    real height(real lat, real lon) const;
+    bool height(real lat, real lon, real& h_out) const;
     Geoid(const Geoid&) = delete;            // copy constructor not allowed
     Geoid& operator=(const Geoid&) = delete; // copy assignment not allowed
   public:
@@ -198,9 +207,9 @@ namespace GeographicLib {
      *   true (the default) means cubic.
      * @param[in] threadsafe (optional), if true, construct a thread safe
      *   object.  The default is false
-     * @exception GeographicErr if the data file cannot be found, is
+     * @note fail if the data file cannot be found, is
      *   unreadable, or is corrupt.
-     * @exception GeographicErr if \e threadsafe is true but the memory
+     * @note fail if \e threadsafe is true but the memory
      *   necessary for caching the data can't be allocated.
      *
      * The data file is formed by appending ".pgm" to the name.  If \e path is
@@ -222,11 +231,11 @@ namespace GeographicLib {
      * @param[in] north latitude (degrees) of the north edge of the cached
      *   area.
      * @param[in] east longitude (degrees) of the east edge of the cached area.
-     * @exception GeographicErr if the memory necessary for caching the data
+     * @note fail if the memory necessary for caching the data
      *   can't be allocated (in this case, you will have no cache and can try
      *   again with a smaller area).
-     * @exception GeographicErr if there's a problem reading the data.
-     * @exception GeographicErr if this is called on a threadsafe Geoid.
+     * @note fail if there's a problem reading the data.
+     * @note fail if this is called on a threadsafe Geoid.
      *
      * Cache the data for the specified "rectangular" area bounded by the
      * parallels \e south and \e north and the meridians \e west and \e east.
@@ -234,16 +243,16 @@ namespace GeographicLib {
      * adding 360&deg; to its value.  \e south and \e north should be in
      * the range [&minus;90&deg;, 90&deg;].
      **********************************************************************/
-    void CacheArea(real south, real west, real north, real east) const;
+    bool CacheArea(real south, real west, real north, real east) const;
 
     /**
      * Cache all the data.
      *
-     * @exception GeographicErr if the memory necessary for caching the data
+     * @note fail if the memory necessary for caching the data
      *   can't be allocated (in this case, you will have no cache and can try
      *   again with a smaller area).
-     * @exception GeographicErr if there's a problem reading the data.
-     * @exception GeographicErr if this is called on a threadsafe Geoid.
+     * @note fail if there's a problem reading the data.
+     * @note fail if this is called on a threadsafe Geoid.
      *
      * On most computers, this is fast for data sets with grid resolution of 5'
      * or coarser.  For a 1' grid, the required RAM is 450MB; a 2.5' grid needs
@@ -268,15 +277,15 @@ namespace GeographicLib {
      *
      * @param[in] lat latitude of the point (degrees).
      * @param[in] lon longitude of the point (degrees).
-     * @exception GeographicErr if there's a problem reading the data; this
+     * @note fail if there's a problem reading the data; this
      *   never happens if (\e lat, \e lon) is within a successfully cached
      *   area.
      * @return the height of the geoid above the ellipsoid (meters).
      *
      * The latitude should be in [&minus;90&deg;, 90&deg;].
      **********************************************************************/
-    Math::real operator()(real lat, real lon) const {
-      return height(lat, lon);
+    bool operator()(real lat, real lon, real& h_out) const {
+      return height(lat, lon, h_out);
     }
 
     /**
@@ -290,14 +299,22 @@ namespace GeographicLib {
      *   conversion; Geoid::GEOIDTOELLIPSOID means convert a height above the
      *   geoid to a height above the ellipsoid; Geoid::ELLIPSOIDTOGEOID means
      *   convert a height above the ellipsoid to a height above the geoid.
-     * @exception GeographicErr if there's a problem reading the data; this
+     * @note fail if there's a problem reading the data; this
      *   never happens if (\e lat, \e lon) is within a successfully cached
      *   area.
      * @return converted height (meters).
      **********************************************************************/
     Math::real ConvertHeight(real lat, real lon, real h,
-                             convertflag d) const {
-      return h + real(d) * height(lat, lon);
+                             convertflag d, real& h_out) const {
+      real h_val;
+      bool result = height(lat, lon, h_val);
+      if (result) {
+        h_out = h + real(d) * h_val;
+        return true;
+      } else {
+        h_out = Math::NaN();
+        return false;
+      }
     }
 
     ///@}

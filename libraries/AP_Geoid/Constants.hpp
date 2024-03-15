@@ -49,7 +49,6 @@
 #  define GEOGRAPHICLIB_DEPRECATED(msg)
 #endif
 
-#include <stdexcept>
 #include <string>
 #include <AP_Geoid/Math.hpp>
 
@@ -116,28 +115,6 @@ namespace GeographicLib {
     template<typename T = real> static T meter() { return T(1); }
     ///@}
   };
-
-  /**
-   * \brief Exception handling for %GeographicLib
-   *
-   * A class to handle exceptions.  It's derived from std::runtime_error so it
-   * can be caught by the usual catch clauses.
-   *
-   * Example of use:
-   * \include example-GeographicErr.cpp
-   **********************************************************************/
-  class GeographicErr : public std::runtime_error {
-  public:
-
-    /**
-     * Constructor
-     *
-     * @param[in] msg a string message, which is accessible in the catch
-     *   clause via what().
-     **********************************************************************/
-    GeographicErr(const std::string& msg) : std::runtime_error(msg) {}
-  };
-
 } // namespace GeographicLib
 
 #endif  // GEOGRAPHICLIB_CONSTANTS_HPP
