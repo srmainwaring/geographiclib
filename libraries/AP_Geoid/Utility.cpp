@@ -7,4 +7,4 @@
  * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
-#include <GeographicLib/Utility.hpp>
+#include <AP_Geoid/Utility.hpp>

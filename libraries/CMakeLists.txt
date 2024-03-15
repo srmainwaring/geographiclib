@@ -2,17 +2,17 @@
 
 # Include all the .cpp files in the library.
 set (SOURCES
-  Geoid.cpp
-  Math.cpp
-  Utility.cpp
+  ./AP_Geoid/Geoid.cpp
+  ./AP_Geoid/Math.cpp
+  ./AP_Geoid/Utility.cpp
   )
 
 set (HEADERS
-  ${PROJECT_BINARY_DIR}/include/GeographicLib/Config.h
-  ../include/GeographicLib/Constants.hpp
-  ../include/GeographicLib/Geoid.hpp
-  ../include/GeographicLib/Math.hpp
-  ../include/GeographicLib/Utility.hpp
+  ${PROJECT_BINARY_DIR}/include/AP_Geoid/Config.h
+  ../include/AP_Geoid/Constants.hpp
+  ../include/AP_Geoid/Geoid.hpp
+  ../include/AP_Geoid/Math.hpp
+  ../include/AP_Geoid/Utility.hpp
   )
 
 # Define the library.

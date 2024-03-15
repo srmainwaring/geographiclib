@@ -7,7 +7,7 @@
  * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
-#include <GeographicLib/Math.hpp>
+#include <AP_Geoid/Math.hpp>
 
 #if defined(_MSC_VER)
 // Squelch warnings about constant conditional and enum-float expressions

@@ -10,7 +10,7 @@
 #if !defined(GEOGRAPHICLIB_CONSTANTS_HPP)
 #define GEOGRAPHICLIB_CONSTANTS_HPP 1
 
-#include <GeographicLib/Config.h>
+#include <AP_Geoid/Config.h>
 
 /**
  * @relates GeographicLib::Constants
@@ -73,7 +73,7 @@
 
 #include <stdexcept>
 #include <string>
-#include <GeographicLib/Math.hpp>
+#include <AP_Geoid/Math.hpp>
 
 /**
  * \brief Namespace for %GeographicLib

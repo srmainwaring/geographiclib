@@ -162,10 +162,10 @@ endif ()
 
 # Create a Config.h to expose system information to the compiler
 configure_file (
-  include/GeographicLib/Config.h.in
-  include/GeographicLib/Config.h
+  include/AP_Geoid/Config.h.in
+  include/AP_Geoid/Config.h
   @ONLY)
 
 # The list of subdirectories to process
-add_subdirectory (src)
+add_subdirectory (libraries)
 add_subdirectory (cmake)

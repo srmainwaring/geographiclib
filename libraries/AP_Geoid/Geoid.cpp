@@ -7,10 +7,10 @@
  * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
-#include <GeographicLib/Geoid.hpp>
+#include <AP_Geoid/Geoid.hpp>
 // For getenv
 #include <cstdlib>
-#include <GeographicLib/Utility.hpp>
+#include <AP_Geoid/Utility.hpp>
 
 #if !defined(GEOGRAPHICLIB_DATA)
 #  if defined(_WIN32)
