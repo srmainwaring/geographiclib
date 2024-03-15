@@ -10,9 +10,15 @@
 #if !defined(GEOGRAPHICLIB_GEOID_HPP)
 #define GEOGRAPHICLIB_GEOID_HPP 1
 
+#define GEOGRAPHICLIB_GEOID_ENABLE_CACHE 0
+
+#if GEOGRAPHICLIB_GEOID_ENABLE_CACHE
 #include <vector>
+#endif
+
 #include <fstream>
 #include <AP_Geoid/Constants.hpp>
+
 
 #if !defined(GEOGRAPHICLIB_GEOID_PGM_PIXEL_WIDTH)
 /**
@@ -102,11 +108,14 @@ namespace GeographicLib {
 
     bool _has_file_load_error = false;
 
+#if GEOGRAPHICLIB_GEOID_ENABLE_CACHE
     // Area cache
     mutable std::vector< std::vector<pixel_t> > _data;
     mutable bool _cache;
+
     // NE corner and extent of cache
     mutable int _xoffset, _yoffset, _xsize, _ysize;
+#endif
     // Cell cache
     mutable int _ix, _iy;
     mutable real _v00, _v01, _v10, _v11;
@@ -126,13 +135,16 @@ namespace GeographicLib {
       else if (ix >= _width) {
         ix -= _width;
       }
+#if GEOGRAPHICLIB_GEOID_ENABLE_CACHE
       if (_cache && iy >= _yoffset && iy < _yoffset + _ysize &&
           ((ix >= _xoffset && ix < _xoffset + _xsize) ||
            (ix + _width >= _xoffset && ix + _width < _xoffset + _xsize))) {
         val = real(_data[iy - _yoffset]
                     [ix >= _xoffset ? ix - _xoffset : ix + _width - _xoffset]);
         return true;
-      } else {
+      } else
+#endif
+      {
         if (iy < 0 || iy >= _height) {
           iy = iy < 0 ? -iy : 2 * (_height - 1) - iy;
           ix += (ix < _width/2 ? 1 : -1) * _width/2;
@@ -211,6 +223,7 @@ namespace GeographicLib {
     explicit Geoid(const std::string& name, const std::string& path = "",
                    bool cubic = true);
 
+#if GEOGRAPHICLIB_GEOID_ENABLE_CACHE
     /**
      * Set up a cache.
      *
@@ -253,6 +266,7 @@ namespace GeographicLib {
      * thread safe Geoid.)
      **********************************************************************/
     void CacheClear() const;
+#endif
 
     ///@}
 
@@ -376,6 +390,7 @@ namespace GeographicLib {
      **********************************************************************/
     Math::real Scale() const { return _scale; }
 
+#if GEOGRAPHICLIB_GEOID_ENABLE_CACHE
     /**
      * @return true if a data cache is active.
      **********************************************************************/
@@ -416,6 +431,7 @@ namespace GeographicLib {
         real(Math::qd) - ( _yoffset + _ysize - 1 - _cubic) / _rlatres :
         0;
     }
+#endif
 
     /**
      * @return \e a the equatorial radius of the WGS84 ellipsoid (meters).

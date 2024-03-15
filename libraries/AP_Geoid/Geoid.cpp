@@ -10,7 +10,11 @@
 #include <AP_Geoid/Geoid.hpp>
 // For getenv
 #include <cstdlib>
+#include <sstream>
+
+#if GEOGRAPHICLIB_GEOID_ENABLE_CACHE
 #include <AP_Geoid/Utility.hpp>
+#endif
 
 #if !defined(GEOGRAPHICLIB_DATA)
 #  if defined(_WIN32)
@@ -326,7 +330,11 @@ namespace GeographicLib {
     }
     _rlonres = _width / real(Math::td);
     _rlatres = (_height - 1) / real(Math::hd);
+
+#if GEOGRAPHICLIB_GEOID_ENABLE_CACHE
     _cache = false;
+#endif
+
     _ix = _width;
     _iy = _height;
     // Ensure that file errors throw exceptions
@@ -435,6 +443,7 @@ namespace GeographicLib {
     }
   }
 
+#if GEOGRAPHICLIB_GEOID_ENABLE_CACHE
   void Geoid::CacheClear() const {
     {
       _cache = false;
@@ -529,6 +538,7 @@ namespace GeographicLib {
     }
     return true;
   }
+#endif
 
   string Geoid::DefaultGeoidPath() {
     string path;
