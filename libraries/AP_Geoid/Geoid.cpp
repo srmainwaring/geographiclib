@@ -24,11 +24,6 @@
 #  define GEOGRAPHICLIB_GEOID_DEFAULT_NAME "egm96-5"
 #endif
 
-#if defined(_MSC_VER)
-// Squelch warnings about unsafe use of getenv and enum-float expressions
-#  pragma warning (disable: 4996 5055)
-#endif
-
 namespace GeographicLib {
 
   using namespace std;

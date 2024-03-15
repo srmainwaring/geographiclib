@@ -9,11 +9,6 @@
 
 #include <AP_Geoid/Math.hpp>
 
-#if defined(_MSC_VER)
-// Squelch warnings about constant conditional and enum-float expressions
-#  pragma warning (disable: 4127 5055)
-#endif
-
 namespace GeographicLib {
 
   using namespace std;
@@ -43,27 +38,15 @@ namespace GeographicLib {
   }
 
   template<typename T> T Math::NaN() {
-#if defined(_MSC_VER)
-    return numeric_limits<T>::has_quiet_NaN ?
-      numeric_limits<T>::quiet_NaN() :
-      (numeric_limits<T>::max)();
-#else
     return numeric_limits<T>::has_quiet_NaN ?
       numeric_limits<T>::quiet_NaN() :
       numeric_limits<T>::max();
-#endif
   }
 
   template<typename T> T Math::infinity() {
-#if defined(_MSC_VER)
-    return numeric_limits<T>::has_infinity ?
-        numeric_limits<T>::infinity() :
-        (numeric_limits<T>::max)();
-#else
     return numeric_limits<T>::has_infinity ?
       numeric_limits<T>::infinity() :
       numeric_limits<T>::max();
-#endif
     }
 
   /// \cond SKIP

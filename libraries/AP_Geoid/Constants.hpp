@@ -36,24 +36,6 @@
                            GEOGRAPHICLIB_VERSION_MINOR, \
                            GEOGRAPHICLIB_VERSION_PATCH)
 
-// For reference, here is a table of Visual Studio and _MSC_VER
-// correspondences:
-//
-// _MSC_VER  Visual Studio
-//   1100     vc5
-//   1200     vc6
-//   1300     vc7
-//   1310     vc7.1 (2003)
-//   1400     vc8   (2005)
-//   1500     vc9   (2008)
-//   1600     vc10  (2010)
-//   1700     vc11  (2012)
-//   1800     vc12  (2013)
-//   1900     vc14  (2015) First version of VS to include enough C++11 support
-//   191[0-9] vc15  (2017)
-//   192[0-9] vc16  (2019)
-//   193[0-9] vc17  (2022)
-
 #define GEOGRAPHICLIB_EXPORT
 
 // Use GEOGRAPHICLIB_DEPRECATED to mark functions, types or variables as
@@ -65,8 +47,6 @@
 #  else
 #    define GEOGRAPHICLIB_DEPRECATED(msg) __attribute__((deprecated))
 #  endif
-#elif defined(_MSC_VER) && _MSC_VER >= 1300
-#  define GEOGRAPHICLIB_DEPRECATED(msg) __declspec(deprecated(msg))
 #else
 #  define GEOGRAPHICLIB_DEPRECATED(msg)
 #endif

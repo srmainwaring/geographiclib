@@ -14,12 +14,6 @@
 #include <fstream>
 #include <AP_Geoid/Constants.hpp>
 
-#if defined(_MSC_VER)
-// Squelch warnings about dll vs vector and constant conditional expressions
-#  pragma warning (push)
-#  pragma warning (disable: 4251 4127)
-#endif
-
 #if !defined(GEOGRAPHICLIB_GEOID_PGM_PIXEL_WIDTH)
 /**
  * The size of the pixel data in the pgm data files for the geoids.  2 is the
@@ -466,9 +460,5 @@ namespace GeographicLib {
   };
 
 } // namespace GeographicLib
-
-#if defined(_MSC_VER)
-#  pragma warning (pop)
-#endif
 
 #endif  // GEOGRAPHICLIB_GEOID_HPP
