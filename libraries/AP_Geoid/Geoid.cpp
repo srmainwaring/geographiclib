@@ -8,7 +8,6 @@
  **********************************************************************/
 
 #include <AP_Geoid/Geoid.hpp>
-#include <iostream>
 // For getenv
 #include <cstdlib>
 #include <AP_Geoid/Utility.hpp>
@@ -211,13 +210,13 @@ namespace GeographicLib {
     _filename = _dir + "/" + _name + (pixel_size_ != 4 ? ".pgm" : ".pgm4");
     _file.open(_filename.c_str(), ios::binary);
     if (!(_file.good())) {
-      std::cout << "File not readable " <<  _filename << "\n";
+      printf("File not readable %s\n", _filename.c_str());
       _has_file_load_error = true;
       return;
     }
     string s;
     if (!(getline(_file, s) && s == "P5")) {
-      std::cout << "File not in PGM format " << _filename << "\n";
+      printf("File not in PGM format %s\n", _filename.c_str());
       _has_file_load_error = true;
       return;
     }
@@ -241,13 +240,13 @@ namespace GeographicLib {
             (key == "Description" ? _description : _datetime) = s.substr(p);
         } else if (key == "Offset") {
           if (!(is >> _offset)) {
-            std::cout << "Error reading offset " << _filename << "\n";
+            printf("Error reading offset %s\n", _filename.c_str());
             _has_file_load_error = true;
             return;
           }
         } else if (key == "Scale") {
           if (!(is >> _scale)) {
-            std::cout << "Error reading scale " << _filename << "\n";
+            printf("Error reading scale %s\n", _filename.c_str());
             _has_file_load_error = true;
             return;
           }
@@ -261,7 +260,7 @@ namespace GeographicLib {
       } else {
         istringstream is(s);
         if (!(is >> _width >> _height)) {
-          std::cout << "Error reading raster size " << _filename << "\n";
+          printf("Error reading raster size %s\n", _filename.c_str());
           _has_file_load_error = true;
           return;
         }
@@ -271,12 +270,12 @@ namespace GeographicLib {
     {
       unsigned maxval;
       if (!(_file >> maxval)) {
-        std::cout << "Error reading maxval " << _filename << "\n";
+        printf("Error reading maxval %s\n", _filename.c_str());
         _has_file_load_error = true;
         return;
       }
       if (maxval != pixel_max_) {
-        std::cout << "Incorrect value of maxval " << _filename << "\n";
+        printf("Incorrect value of maxval %s\n", _filename.c_str());
         _has_file_load_error = true;
         return;
       }
@@ -285,35 +284,35 @@ namespace GeographicLib {
       _swidth = (unsigned long long)(_width);
     }
     if (_offset == numeric_limits<real>::max()) {
-      std::cout << "Offset not set " << _filename << "\n";
+      printf("Offset not set %s\n", _filename.c_str());
       _has_file_load_error = true;
       return;
     }
     if (_scale == 0) {
-      std::cout << "Scale not set " << _filename << "\n";
+      printf("Scale not set %s\n", _filename.c_str());
       _has_file_load_error = true;
       return;
     }
     if (_scale < 0) {
-      std::cout << "Scale must be positive " << _filename << "\n";
+      printf("Scale must be positive %s\n", _filename.c_str());
       _has_file_load_error = true;
       return;
     }
     if (_height < 2 || _width < 2) {
       // Coarsest grid spacing is 180deg.
-      std::cout << "Raster size too small " << _filename << "\n";
+      printf("Raster size too small %s\n", _filename.c_str());
       _has_file_load_error = true;
       return;
     }
     if (_width & 1) {
       // This is so that longitude grids can be extended thru the poles.
-      std::cout << "Raster width is odd " << _filename << "\n";
+      printf("Raster width is odd %s\n", _filename.c_str());
       _has_file_load_error = true;
       return;
     }
     if (!(_height & 1)) {
       // This is so that latitude grid includes the equator.
-      std::cout << "Raster height is even " << _filename << "\n";
+      printf("Raster height is even %s\n", _filename.c_str());
       _has_file_load_error = true;
       return;
     }
@@ -323,7 +322,7 @@ namespace GeographicLib {
         (unsigned long long)(_file.tellg())) {
       // Possibly this test should be "<" because the file contains, e.g., a
       // second image.  However, for now we are more strict.
-      std::cout << "File has the wrong length " << _filename << "\n";
+      printf("File has the wrong length %s\n", _filename.c_str());
       _has_file_load_error = true;
       return;
     }
@@ -458,7 +457,7 @@ namespace GeographicLib {
 
   bool Geoid::CacheArea(real south, real west, real north, real east) const {
     if (_threadsafe) {
-      std::cout << "Attempt to change cache of threadsafe Geoid\n";
+      printf("Attempt to change cache of threadsafe Geoid\n");
       return false;
     }
     if (south > north) {
@@ -507,7 +506,7 @@ namespace GeographicLib {
     }
     catch (const bad_alloc&) {
       CacheClear();
-      std::cout << "Insufficient memory for caching " <<  _filename << "\n";
+      printf("Insufficient memory for caching %s\n", _filename.c_str());
       return false;
     }
 
@@ -536,7 +535,7 @@ namespace GeographicLib {
     }
     catch (const exception& e) {
       CacheClear();
-      std::cout << "Error filling cache " << e.what() << "\n";
+      printf("Error filling cache %s", e.what());
       return false;
     }
     return true;

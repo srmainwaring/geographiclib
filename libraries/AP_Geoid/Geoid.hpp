@@ -12,7 +12,6 @@
 
 #include <vector>
 #include <fstream>
-#include <iostream>
 #include <AP_Geoid/Constants.hpp>
 
 #if !defined(GEOGRAPHICLIB_GEOID_PGM_PIXEL_WIDTH)
@@ -164,7 +163,7 @@ namespace GeographicLib {
           err += _filename;
           err += ": ";
           err += e.what();
-          std::cout << err << "\n";
+          printf("%s\n", err.c_str());
           return false;
         }
       }

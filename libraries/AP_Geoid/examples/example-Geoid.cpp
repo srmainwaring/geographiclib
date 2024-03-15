@@ -2,7 +2,6 @@
 // This requires that the egm96-5 geoid model be installed; see
 // https://geographiclib.sourceforge.io/C++/doc/geoid.html#geoidinst
 
-#include <iostream>
 #include <exception>
 #include <AP_Geoid/Geoid.hpp>
 
@@ -18,11 +17,11 @@ int main() {
     if (egm96(lat, lon, geoid_height)) {
       double height_above_ellipsoid = (height_above_geoid +
                                 Geoid::GEOIDTOELLIPSOID * geoid_height);
-      cout << height_above_ellipsoid << "\n";
+      printf("%f\n", height_above_ellipsoid);
     }
   }
   catch (const exception& e) {
-    cerr << "Caught exception: " << e.what() << "\n";
+    printf("Caught exception: %s\n", e.what());
     return 1;
   }
 }
