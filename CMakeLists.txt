@@ -9,11 +9,6 @@ set (PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
 if (PROJECT_VERSION_PATCH GREATER 0)
   set (PROJECT_VERSION "${PROJECT_VERSION}.${PROJECT_VERSION_PATCH}")
 endif ()
-set (PROJECT_VERSION_SUFFIX "")
-set (PROJECT_FULLVERSION ${PROJECT_VERSION}${PROJECT_VERSION_SUFFIX})
-
-set (PACKAGE_DIR "${PROJECT_NAME}-${PROJECT_VERSION}")
-set (PACKAGE_NAME "${PROJECT_NAME}-${PROJECT_FULLVERSION}")
 
 # The library version tracks the numbering given by libtool in the
 # autoconf set up.
@@ -33,8 +28,8 @@ set (GEOGRAPHICLIB_DATA
 # (5) Set the default "real" precision.  This should probably be left
 # at 2 (double).
 set (GEOGRAPHICLIB_PRECISION 2 CACHE STRING
-  "Precision: 1 = float, 2 = double, 3 = extended, 4 = quadruple, 5 = variable")
-set_property (CACHE GEOGRAPHICLIB_PRECISION PROPERTY STRINGS 1 2 3 4 5)
+  "Precision: 1 = float, 2 = double")
+set_property (CACHE GEOGRAPHICLIB_PRECISION PROPERTY STRINGS 1 2)
 
 set (GEOGRAPHICLIB_STATIC_LIB ON)
 set (PROJECT_STATIC_LIBRARIES GeographicLib_STATIC)
