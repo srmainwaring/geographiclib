@@ -43,19 +43,12 @@ namespace GeographicLib {
       numeric_limits<T>::max();
   }
 
-  template<typename T> T Math::infinity() {
-    return numeric_limits<T>::has_infinity ?
-      numeric_limits<T>::infinity() :
-      numeric_limits<T>::max();
-    }
-
   /// \cond SKIP
   // Instantiate
 #define GEOGRAPHICLIB_MATH_INSTANTIATE(T)                                  \
   template T    GEOGRAPHICLIB_EXPORT Math::sum          <T>(T, T, T&);     \
   template T    GEOGRAPHICLIB_EXPORT Math::AngNormalize <T>(T);            \
-  template T    GEOGRAPHICLIB_EXPORT Math::NaN          <T>();             \
-  template T    GEOGRAPHICLIB_EXPORT Math::infinity     <T>();
+  template T    GEOGRAPHICLIB_EXPORT Math::NaN          <T>();
   // Instantiate with the standard floating type
   GEOGRAPHICLIB_MATH_INSTANTIATE(float)
   GEOGRAPHICLIB_MATH_INSTANTIATE(double)
@@ -64,7 +57,6 @@ namespace GeographicLib {
 
   // Also we need int versions for Utility::nummatch
   template int GEOGRAPHICLIB_EXPORT Math::NaN     <int>();
-  template int GEOGRAPHICLIB_EXPORT Math::infinity<int>();
   /// \endcond
 
 } // namespace GeographicLib
