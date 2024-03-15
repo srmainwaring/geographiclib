@@ -172,14 +172,6 @@ namespace GeographicLib {
     template<typename T = real> static T NaN();
 
     /**
-     * Infinity
-     *
-     * @tparam T the type of the returned value.
-     * @return infinity if available, otherwise return the max real.
-     **********************************************************************/
-    template<typename T = real> static T infinity();
-
-    /**
      * Swap the bytes of a quantity
      *
      * @tparam T the type of the argument and the returned value.
