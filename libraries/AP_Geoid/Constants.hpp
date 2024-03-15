@@ -49,7 +49,6 @@
 #  define GEOGRAPHICLIB_DEPRECATED(msg)
 #endif
 
-#include <string>
 #include <AP_Geoid/Math.hpp>
 
 /**
