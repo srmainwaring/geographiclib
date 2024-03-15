@@ -22,15 +22,6 @@ set (LIBVERSION_BUILD 26.0.0)
 string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
-if (EXISTS ${PROJECT_SOURCE_DIR}/VERSION)
-  # If the file, VERSION, exists then this is a released version of
-  # GeographicLib and the processed man pages are available in the
-  # source tree
-  set (RELEASE ON)
-else ()
-  set (RELEASE OFF)
-endif ()
-
 # User-settable variables
 
 # (1) Where to look for data files.  Various classes look in the geoids,
@@ -45,18 +36,6 @@ set (GEOGRAPHICLIB_PRECISION 2 CACHE STRING
   "Precision: 1 = float, 2 = double, 3 = extended, 4 = quadruple, 5 = variable")
 set_property (CACHE GEOGRAPHICLIB_PRECISION PROPERTY STRINGS 1 2 3 4 5)
 
-# (8) Convert warnings into errors?  Default is OFF if RELEASE, else ON.
-if (RELEASE)
-  option (CONVERT_WARNINGS_TO_ERRORS "Convert warnings into errors?" OFF)
-  # BUILD_MANPAGES is ignored in RELEASE mode
-  option (BUILD_MANPAGES "Convert pod files to manpages" OFF)
-else ()
-  option (CONVERT_WARNINGS_TO_ERRORS "Convert warnings into errors?" ON)
-  # Convert pod files to man pages.  This only necessary with a
-  # non-release tree.
-  option (BUILD_MANPAGES "Convert pod files to manpages" ON)
-endif ()
-
 set (GEOGRAPHICLIB_STATIC_LIB ON)
 set (PROJECT_STATIC_LIBRARIES GeographicLib_STATIC)
 
@@ -68,53 +47,7 @@ set (PROJECT_ALL_LIBRARIES
   ${PROJECT_STATIC_LIBRARIES}
   ${PROJECT_INTERFACE_LIBRARIES})
 
-# Installation directories.  An empty string or "OFF" disables
-# installation of that component.  These are all relative to
-# CMAKE_INSTALL_PREFIX.
-
-# Installation is to ${INCDIR}/GeographicLib
-set (INCDIR "include" CACHE STRING "Where to install header files")
-set (BINDIR "bin" CACHE STRING "Where to install tools")
-set (SBINDIR "sbin" CACHE STRING "Where to install admin tools")
-if (CMAKE_INSTALL_LIBDIR)
-  # If it's defined, use this GNUInstallDirs path to support lib, lib64,
-  # and lib/<muliarch-tuple> variants
-  set (LIBDIR "${CMAKE_INSTALL_LIBDIR}"
-    CACHE STRING "Where to install libraries")
-else ()
-  set (LIBDIR "lib" CACHE STRING "Where to install libraries")
-endif ()
-set (DLLDIR "bin" CACHE STRING "Where to install dlls")
-# Installation is to ${MANDIR}/man1 and ${MANDIR}/man8
-set (CMAKEDIR "lib/cmake/${PROJECT_NAME}"
-  CACHE STRING "Where to install cmake configs")
-
-# The relative path to library directory from the bin directory
-if (LIBDIR AND BINDIR)
-  file (RELATIVE_PATH RELATIVE_LIBDIR
-    "${CMAKE_INSTALL_PREFIX}/${BINDIR}" "${CMAKE_INSTALL_PREFIX}/${LIBDIR}")
-else ()
-  set (RELATIVE_LIBDIR "")
-endif ()
-
 set (LIBNAME "GeographicLib")
-
-# Set the run time path for shared libraries for non-Windows machines.
-# (1) include link path for external packages (not needed with
-# GeographicLib because there are no external packages).  This only
-# makes sense for native builds.
-if (NOT CMAKE_CROSSCOMPILING)
-  set (CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-endif ()
-# (2) include installed path for GeographicLib.
-if (NOT APPLE AND RELATIVE_LIBDIR)
-  # Use relative path so that package is relocatable
-  set (CMAKE_INSTALL_RPATH "\$ORIGIN/${RELATIVE_LIBDIR}")
-else ()
-  # cmake 2.8.12 introduced a way to make the package relocatable.
-  # See also INSTALL_RPATH property on the tools.
-  set (CMAKE_MACOSX_RPATH ON)
-endif ()
 
 include (CheckTypeSize)
 check_type_size ("long double" LONG_DOUBLE BUILTIN_TYPES_ONLY)
@@ -169,4 +102,3 @@ configure_file (
 # The list of subdirectories to process
 add_subdirectory (libraries/AP_Geoid)
 add_subdirectory (libraries/AP_Geoid/examples)
-add_subdirectory (cmake)
