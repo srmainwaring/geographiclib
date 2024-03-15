@@ -42,7 +42,6 @@ namespace GeographicLib {
      **********************************************************************/
     template<typename ExtT, typename IntT, bool bigendp>
       static void readarray(std::istream& str, IntT array[], size_t num) {
-#if GEOGRAPHICLIB_PRECISION < 4
       if (sizeof(IntT) == sizeof(ExtT) &&
           std::numeric_limits<IntT>::is_integer ==
           std::numeric_limits<ExtT>::is_integer)
@@ -57,7 +56,6 @@ namespace GeographicLib {
           }
         }
       else
-#endif
         {
           const int bufsize = 1024; // read this many values at a time
           ExtT buffer[bufsize];     // temporary buffer
