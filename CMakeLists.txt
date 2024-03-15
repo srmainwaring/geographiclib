@@ -162,10 +162,11 @@ endif ()
 
 # Create a Config.h to expose system information to the compiler
 configure_file (
-  include/AP_Geoid/Config.h.in
-  include/AP_Geoid/Config.h
-  @ONLY)
+  libraries/AP_Geoid/Config.h.in
+  libraries/AP_Geoid/Config.h
+@ONLY)
 
 # The list of subdirectories to process
-add_subdirectory (libraries)
+add_subdirectory (libraries/AP_Geoid)
+add_subdirectory (libraries/AP_Geoid/examples)
 add_subdirectory (cmake)

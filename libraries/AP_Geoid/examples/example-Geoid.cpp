@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include <exception>
-#include <GeographicLib/Geoid.hpp>
+#include <AP_Geoid/Geoid.hpp>
 
 using namespace std;
 using namespace GeographicLib;

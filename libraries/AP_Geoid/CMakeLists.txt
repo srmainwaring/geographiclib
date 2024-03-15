@@ -2,18 +2,18 @@
 
 # Include all the .cpp files in the library.
 set (SOURCES
-  ./AP_Geoid/Geoid.cpp
-  ./AP_Geoid/Math.cpp
-  ./AP_Geoid/Utility.cpp
-  )
+  Geoid.cpp
+  Math.cpp
+  Utility.cpp
+)
 
 set (HEADERS
-  ${PROJECT_BINARY_DIR}/include/AP_Geoid/Config.h
-  ../include/AP_Geoid/Constants.hpp
-  ../include/AP_Geoid/Geoid.hpp
-  ../include/AP_Geoid/Math.hpp
-  ../include/AP_Geoid/Utility.hpp
-  )
+  ${PROJECT_BINARY_DIR}/libraries/AP_Geoid/Config.h
+  Constants.hpp
+  Geoid.hpp
+  Math.hpp
+  Utility.hpp
+)
 
 # Define the library.
 if (GEOGRAPHICLIB_STATIC_LIB)
@@ -41,9 +41,9 @@ endif ()
 
 if (GEOGRAPHICLIB_STATIC_LIB)
   target_include_directories (${PROJECT_STATIC_LIBRARIES} PUBLIC
-    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:${INCDIR}>)
+    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>/libraries
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>/libraries
+    $<INSTALL_INTERFACE:${INCDIR}>/libraries)
 endif ()
 
 # Specify where the library is installed, adding it to the export targets
