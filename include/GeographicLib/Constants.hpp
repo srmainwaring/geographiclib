@@ -54,18 +54,7 @@
 //   192[0-9] vc16  (2019)
 //   193[0-9] vc17  (2022)
 
-#if defined(_MSC_VER) && defined(GEOGRAPHICLIB_SHARED_LIB) && \
-  GEOGRAPHICLIB_SHARED_LIB
-#  if GEOGRAPHICLIB_SHARED_LIB > 1
-#    error GEOGRAPHICLIB_SHARED_LIB must be 0 or 1
-#  elif defined(GeographicLib_SHARED_EXPORTS)
-#    define GEOGRAPHICLIB_EXPORT __declspec(dllexport)
-#  else
-#    define GEOGRAPHICLIB_EXPORT __declspec(dllimport)
-#  endif
-#else
-#  define GEOGRAPHICLIB_EXPORT
-#endif
+#define GEOGRAPHICLIB_EXPORT
 
 // Use GEOGRAPHICLIB_DEPRECATED to mark functions, types or variables as
 // deprecated.  Code inspired by Apache Subversion's svn_types.h file (via

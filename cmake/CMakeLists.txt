@@ -27,11 +27,6 @@ if (PROJECT_STATIC_LIBRARIES)
 else ()
   set (CONFIG_STATIC_LIBRARIES)
 endif ()
-if (PROJECT_SHARED_LIBRARIES)
-  set (CONFIG_SHARED_LIBRARIES "${PROJECT_NAME}::${PROJECT_SHARED_LIBRARIES}")
-else ()
-  set (CONFIG_SHARED_LIBRARIES)
-endif ()
 
 configure_file (project-config.cmake.in
   "${PROJECT_BINARY_DIR}/${PROJECT_NAME_LOWER}-config.cmake" @ONLY)

@@ -56,7 +56,6 @@ elseif (PACKAGE_FIND_VERSION)
   endif ()
 endif ()
 
-set (@PROJECT_NAME@_SHARED_FOUND @GEOGRAPHICLIB_SHARED_LIB@)
 set (@PROJECT_NAME@_STATIC_FOUND @GEOGRAPHICLIB_STATIC_LIB@)
 
 # Check for the components requested.  The convention is that
