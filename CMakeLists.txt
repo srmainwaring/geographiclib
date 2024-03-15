@@ -463,7 +463,6 @@ set_property (GLOBAL PROPERTY USE_FOLDERS ON)
 
 # The list of subdirectories to process
 add_subdirectory (src)
-add_subdirectory (include/GeographicLib)
 if (EXAMPLEDIR)
   set (CALLED_FROM_TOPLEVEL ON)
   add_subdirectory (examples)   # This just installs the examples
